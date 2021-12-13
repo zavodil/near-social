@@ -161,3 +161,7 @@ export function FollowRecommendations () {
 export function CompareHistoryModal () {
   return import(/*webpackChunkName: "modals/compare_history_modal" */'../components/compare_history_modal');
 }
+
+export function Explore () {
+  return import(/* webpackChunkName: "features/explore" */'../../explore');
+}
