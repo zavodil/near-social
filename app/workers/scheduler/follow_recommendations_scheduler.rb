@@ -49,11 +49,11 @@ class Scheduler::FollowRecommendationsScheduler
         end
       end
 
-      redis.pipelined do
-        redis.del(key(locale))
+      redis.pipelined do |pipeline|
+        pipeline.del(key(locale))
 
         recommendations.each do |(account_id, rank)|
-          redis.zadd(key(locale), rank, account_id)
+          pipeline.zadd(key(locale), rank, account_id)
         end
       end
     end
