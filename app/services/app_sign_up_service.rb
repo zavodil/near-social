@@ -19,6 +19,9 @@ class AppSignUpService < BaseService
   private
 
   def allowed_registrations?
-    Setting.registrations_mode != 'none' && !Rails.configuration.x.single_user_mode
+    # Setting.registrations_mode != 'none' && !Rails.configuration.x.single_user_mode
+    # enable API signup
+    # TODO app_id validation
+    !Rails.configuration.x.single_user_mode
   end
 end

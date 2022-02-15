@@ -9,11 +9,14 @@ class Api::V1::AccountsController < Api::BaseController
 
   before_action :require_user!, except: [:show, :create]
   before_action :set_account, except: [:create]
-  before_action :check_enabled_registrations, only: [:create]
+  # enable API signup
+  # TODO app_id validation
+  # before_action :check_enabled_registrations, only: [:create]
 
   skip_before_action :require_authenticated_user!, only: :create
 
-  override_rate_limit_headers :follow, family: :follows
+  # disable API rate_limit to avoid app congestion
+  # override_rate_limit_headers :follow, family: :follows
 
   def show
     render json: @account, serializer: REST::AccountSerializer
