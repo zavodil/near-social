@@ -466,7 +466,7 @@ Rails.application.routes.draw do
         resources :relationships, only: :index
       end
 
-      resources :accounts, only: [:create, :show] do
+      resources :accounts, only: [:create, :set_password, :show] do
         resources :statuses, only: :index, controller: 'accounts/statuses'
         resources :followers, only: :index, controller: 'accounts/follower_accounts'
         resources :following, only: :index, controller: 'accounts/following_accounts'
@@ -482,6 +482,7 @@ Rails.application.routes.draw do
           post :unblock
           post :mute
           post :unmute
+          post :set_password
         end
 
         resource :pin, only: :create, controller: 'accounts/pins'

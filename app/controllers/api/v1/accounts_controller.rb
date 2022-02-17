@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Api::V1::AccountsController < Api::BaseController
-  before_action -> { authorize_if_got_token! :read, :'read:accounts' }, except: [:create, :follow, :unfollow, :remove_from_followers, :block, :unblock, :mute, :unmute]
+  before_action -> { authorize_if_got_token! :read, :'read:accounts' }, except: [:create, :set_password, :follow, :unfollow, :remove_from_followers, :block, :unblock, :mute, :unmute]
   before_action -> { doorkeeper_authorize! :follow, :'write:follows' }, only: [:follow, :unfollow, :remove_from_followers]
   before_action -> { doorkeeper_authorize! :follow, :'write:mutes' }, only: [:mute, :unmute]
   before_action -> { doorkeeper_authorize! :follow, :'write:blocks' }, only: [:block, :unblock]
-  before_action -> { doorkeeper_authorize! :write, :'write:accounts' }, only: [:create]
+  before_action -> { doorkeeper_authorize! :write, :'write:accounts' }, only: [:create, :set_password]
 
   before_action :require_user!, except: [:show, :create]
   before_action :set_account, except: [:create]
@@ -13,7 +13,7 @@ class Api::V1::AccountsController < Api::BaseController
   # TODO app_id validation
   # before_action :check_enabled_registrations, only: [:create]
 
-  skip_before_action :require_authenticated_user!, only: :create
+  skip_before_action :require_authenticated_user!, only: [:create, :set_password]
 
   # disable API rate_limit to avoid app congestion
   # override_rate_limit_headers :follow, family: :follows
@@ -32,6 +32,14 @@ class Api::V1::AccountsController < Api::BaseController
     self.status        = response.status
   rescue ActiveRecord::RecordInvalid => e
     render json: ValidationErrorFormatter.new(e, :'account.username' => :username, :'invite_request.text' => :reason).as_json, status: :unprocessable_entity
+  end
+
+  def set_password
+   @user = @account.user
+   @user.password = account_params[:password]
+   @user.save(:validate => true)
+
+   render json: @account, serializer: REST::AccountSerializer
   end
 
   def follow
