@@ -42,6 +42,13 @@ class Api::V1::AccountsController < Api::BaseController
    render json: @account, serializer: REST::AccountSerializer
   end
 
+  def confirm_account
+   @account.user.update!(confirmed_at: Time.now.utc)
+   @account.update!(discoverable: true)
+
+   render json: @account, serializer: REST::AccountSerializer
+  end
+
   def follow
     follow  = FollowService.new.call(current_user.account, @account, reblogs: params.key?(:reblogs) ? truthy_param?(:reblogs) : nil, notify: params.key?(:notify) ? truthy_param?(:notify) : nil, with_rate_limit: true)
     options = @account.locked? || current_user.account.silenced? ? {} : { following_map: { @account.id => { reblogs: follow.show_reblogs?, notify: follow.notify? } }, requested_map: { @account.id => false } }
